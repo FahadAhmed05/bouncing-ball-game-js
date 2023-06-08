@@ -4,13 +4,15 @@ let leftWall;
 let rightWall;
 let topWall;
 const width = 1340;
-const height = 600;
+const height = 500;
 let timer = 0;
 let speedIncreaseInterval = 1000; // Increase speed every 1 second
 let speedIncreaseAmount = 1; // Amount to increase the ball's speed
+let gameStarted = false;
 
 function setup() {
-  createCanvas(width, height);
+  const canvas = createCanvas(width, height);
+  canvas.parent("canvas-container");
   background(0);
 }
 
@@ -20,35 +22,44 @@ function draw() {
 
   timer += frameRate() / 60;
 
-  if (ball) {
-    ball.display();
-    ball.move();
+  if (gameStarted) {
+    if (ball) {
+      ball.display();
+      ball.move();
 
-    if (bar && ball.collideWith(bar)) {
-      console.log("Collison Bar and Ball", bar.width, bar.height);
-      // Reverse the vertical speed of the ball
-      ball.yspeed *= -1;
+      if (bar && ball.collideWith(bar)) {
+        console.log("Collision Bar and Ball", bar.width, bar.height);
+        // Reverse the vertical speed of the ball
+        ball.yspeed *= -1;
+      }
+    }
+
+    if (bar) {
+      bar.display();
+      bar.move();
+    }
+
+    if (leftWall) {
+      leftWall.display();
+    }
+
+    if (rightWall) {
+      rightWall.display();
+    }
+
+    if (topWall) {
+      topWall.display();
     }
   }
-  if (bar) {
-    bar.display();
-    bar.move();
-  }
-  if (leftWall) {
-    leftWall.display();
-  }
-  if (rightWall) {
-    rightWall.display();
-  }
-  if (topWall) {
-    topWall.display();
-  }
+
   if (timer >= speedIncreaseInterval) {
     timer = 0; // Reset the timer
     ball.xspeed += speedIncreaseAmount; // Increase the ball's horizontal speed
     ball.yspeed += speedIncreaseAmount; // Increase the ball's vertical speed
   }
 }
+
+
 class Ball {
   constructor() {
     // Initialize properties
@@ -138,19 +149,13 @@ class Ball {
       this.x = rightWall.x - this.r; // Set the ball just to the left of the right wall
       this.xspeed = -Math.abs(this.xspeed); // Reverse the horizontal speed of the ball
     }
-    if (this.y + this.r > bar.y) {
-     textAlign(CENTER);
-    textSize(40);
-    fill(255);
-    text("You Lose! ", width / 2, height / 2);
-    }
   }
 }
 
 class Bar {
   constructor() {
     this.x = width / 2;
-    this.y = height - 100;
+    this.y = height - 40;
     this.width = 100;
     this.height = 30;
     this.speed = 5;
@@ -168,6 +173,7 @@ class Bar {
     }
   }
 }
+
 class Wall {
   constructor(xpos, ypos, width, height) {
     this.x = xpos;
@@ -185,12 +191,15 @@ class Wall {
 }
 
 function startGame() {
-  ball = new Ball();
-  bar = new Bar();
-  // left Wall
-  leftWall = new Wall(0, 0, 50, 600);
-  // right wall
-  rightWall = new Wall(width - 50, 0, 50, 600);
-  // top wall
-  topWall = new Wall(0, 0, width, 50);
+  if (!gameStarted) {
+    gameStarted = true;
+    ball = new Ball();
+    bar = new Bar();
+    // left Wall
+    leftWall = new Wall(0, 0, 30, height);
+    // right wall
+    rightWall = new Wall(width - 30, 0, 30, height);
+    // top wall
+    topWall = new Wall(0, 0, width, 30);
+  }
 }
